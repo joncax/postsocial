@@ -36,3 +36,7 @@ Thumbs.db
 # Docker (para o futuro)
 *.env.docker
 EOF
+# Media
+backend/media/uploads/
+backend/media/processed/
+backend/media/stories/

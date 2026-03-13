@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from config.settings import settings
-from api import queues, posts, errors, platforms
+from api import queues, posts, errors, platforms, media
 
 app = FastAPI(
     title="PostSocial API",
@@ -24,6 +24,7 @@ app.include_router(queues.router)
 app.include_router(posts.router)
 app.include_router(errors.router)
 app.include_router(platforms.router)
+app.include_router(media.router)
 
 @app.get("/")
 async def root():
