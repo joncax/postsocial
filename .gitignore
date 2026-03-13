@@ -1,0 +1,38 @@
+cat > .gitignore << 'EOF'
+# Ambiente Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+env/
+
+# Variáveis de ambiente (API keys, passwords)
+.env
+.env.*
+!.env.example
+
+# Base de dados local
+*.db
+*.sqlite
+
+# Ficheiros de upload temporários
+backend/media/uploads/
+backend/media/processed/
+
+# Logs
+*.log
+logs/
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# Docker (para o futuro)
+*.env.docker
+EOF
