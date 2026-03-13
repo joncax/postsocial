@@ -12,7 +12,7 @@ class Settings(BaseSettings):
     # Upload-Post API
     UPLOAD_POST_API_KEY: Optional[str] = None
 
-    # Claude AI
+    # Claude AI — opcional, sem key usa modo mock
     ANTHROPIC_API_KEY: Optional[str] = None
 
     # Email
