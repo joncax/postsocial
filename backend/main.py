@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from config.settings import settings
+from api import queues, posts, errors, platforms
 
 app = FastAPI(
     title="PostSocial API",
@@ -10,7 +11,6 @@ app = FastAPI(
     redoc_url="/redoc"
 )
 
-# CORS — permite o frontend comunicar com a API
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -18,6 +18,12 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Registar routers
+app.include_router(queues.router)
+app.include_router(posts.router)
+app.include_router(errors.router)
+app.include_router(platforms.router)
 
 @app.get("/")
 async def root():
