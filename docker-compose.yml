@@ -1,0 +1,36 @@
+services:
+  db:
+    image: postgres:16
+    container_name: postsocial_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postsocial_user
+      POSTGRES_PASSWORD: postsocial_pass
+      POSTGRES_DB: postsocial_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/storage/sql:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postsocial_user -d postsocial_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  pgadmin:
+    image: dpage/pgadmin4:7.8
+    container_name: postsocial_pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: jonlmcardoso@gmail.com
+      PGADMIN_DEFAULT_PASSWORD: admin_pass
+      PGADMIN_LISTEN_ADDRESS: 0.0.0.0
+      PGADMIN_LISTEN_PORT: 80
+    ports:
+      - "0.0.0.0:5050:80"
+    depends_on:
+      - db
+
+volumes:
+  postgres_data:
