@@ -6,6 +6,7 @@ from api import queues, posts, errors, platforms, media
 from ai import routes as ai_routes
 from scheduler import routes as scheduler_routes
 from scheduler.queue_scheduler import start_scheduler, stop_scheduler
+from publisher import routes as publisher_routes
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -37,6 +38,7 @@ app.include_router(platforms.router)
 app.include_router(media.router)
 app.include_router(ai_routes.router)
 app.include_router(scheduler_routes.router)
+app.include_router(publisher_routes.router)
 
 @app.get("/")
 async def root():
