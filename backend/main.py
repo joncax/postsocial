@@ -1,16 +1,25 @@
-
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from contextlib import asynccontextmanager
 from config.settings import settings
 from api import queues, posts, errors, platforms, media
 from ai import routes as ai_routes
+from scheduler import routes as scheduler_routes
+from scheduler.queue_scheduler import start_scheduler, stop_scheduler
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    start_scheduler()
+    yield
+    stop_scheduler()
 
 app = FastAPI(
     title="PostSocial API",
-    description="API de automação de publicações no Instagram",
+    description="API de automacao de publicacoes no Instagram",
     version="1.0.0",
     docs_url="/docs",
-    redoc_url="/redoc"
+    redoc_url="/redoc",
+    lifespan=lifespan
 )
 
 app.add_middleware(
@@ -21,13 +30,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Registar routers
 app.include_router(queues.router)
 app.include_router(posts.router)
 app.include_router(errors.router)
 app.include_router(platforms.router)
 app.include_router(media.router)
 app.include_router(ai_routes.router)
+app.include_router(scheduler_routes.router)
 
 @app.get("/")
 async def root():
