@@ -19,6 +19,7 @@ export default function Dashboard() {
   const { cart } = useCart()
   const [stats, setStats] = useState({
     queues: 0,
+    review: 0,
     pending: 0,
     published: 0,
     errors: 0
@@ -35,6 +36,7 @@ export default function Dashboard() {
         ])
         setStats({
           queues:    queuesRes.data.length,
+          review:    postsRes.data.filter(p => p.status === "pending_review").length,
           pending:   postsRes.data.filter(p => p.status === "scheduled").length,
           published: postsRes.data.filter(p => p.status === "published").length,
           errors:    errorsRes.data.length
@@ -50,6 +52,7 @@ export default function Dashboard() {
 
   const statCards = [
     { label: "Filas activas",      value: stats.queues,    icon: ListVideo,    color: "text-blue-600",   bg: "bg-blue-50",   link: "/queues" },
+    { label: "Ag. revisão",        value: stats.review,    icon: Clock,        color: "text-orange-600", bg: "bg-orange-50", link: "/posts?status=pending_review" },
     { label: "Posts agendados",    value: stats.pending,   icon: Clock,        color: "text-yellow-600", bg: "bg-yellow-50", link: "/posts?status=scheduled" },
     { label: "Posts publicados",   value: stats.published, icon: CheckCircle,  color: "text-green-600",  bg: "bg-green-50",  link: "/posts?status=published" },
     { label: "Erros por resolver", value: stats.errors,    icon: AlertCircle,  color: "text-red-600",    bg: "bg-red-50",    link: "/errors" },
@@ -83,7 +86,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
         {statCards.map(({ label, value, icon: Icon, color, bg, link }) => (
           <Link key={label} to={link} className="bg-white rounded-xl border border-gray-200 p-5 hover:shadow-sm transition-shadow">
             <div className={`inline-flex p-2 rounded-lg ${bg} mb-3`}>
