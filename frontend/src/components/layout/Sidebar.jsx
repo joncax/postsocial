@@ -9,6 +9,7 @@ import {
   LogOut,
   Zap
 } from 'lucide-react'
+import { useCart } from '../../context/CartContext'
 
 const navItems = [
   { to: '/dashboard',  icon: LayoutDashboard, label: 'Dashboard' },
@@ -20,6 +21,7 @@ const navItems = [
 
 export default function Sidebar() {
   const { user, logout } = useAuth()
+  const { cart } = useCart()
 
   return (
     <aside className="w-64 bg-white border-r border-gray-200 flex flex-col h-screen sticky top-0">
@@ -50,6 +52,11 @@ export default function Sidebar() {
           >
             <Icon className="w-4 h-4" />
             {label}
+            {to === '/upload' && cart.length > 0 && (
+              <span className="ml-auto bg-primary-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                {cart.length}
+              </span>
+            )}
           </NavLink>
         ))}
       </nav>

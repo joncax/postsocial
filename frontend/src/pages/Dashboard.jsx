@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { useCart } from '../context/CartContext'
 import Layout from '../components/layout/Layout'
 import api from '../lib/api'
 import {
@@ -9,11 +10,13 @@ import {
   CheckCircle,
   AlertCircle,
   Clock,
-  TrendingUp
+  TrendingUp,
+  ShoppingCart
 } from 'lucide-react'
 
 export default function Dashboard() {
   const { user } = useAuth()
+  const { cart } = useCart()
   const [stats, setStats] = useState({
     queues: 0,
     pending: 0,
@@ -93,6 +96,40 @@ export default function Dashboard() {
       </div>
 
       <div className="bg-white rounded-xl border border-gray-200 p-6">
+        {cart.length > 0 && (
+          <div className="bg-amber-50 border border-amber-200 rounded-xl p-5 mb-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center">
+                  <ShoppingCart className="w-5 h-5 text-amber-600" />
+                </div>
+                <div>
+                  <p className="font-medium text-amber-900">
+                    Tens {cart.length} post{cart.length > 1 ? 's' : ''} no carrinho
+                  </p>
+                  <p className="text-sm text-amber-600">Ainda não foram agendados</p>
+                </div>
+              </div>
+              <Link
+                to="/upload"
+                className="flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+              >
+                Ver carrinho →
+              </Link>
+            </div>
+            <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
+              {cart.slice(0, 6).map((item, i) => (
+                <img key={i} src={item.preview} alt="" className="w-10 h-10 object-cover rounded-md flex-shrink-0" />
+              ))}
+              {cart.length > 6 && (
+                <div className="w-10 h-10 bg-amber-200 rounded-md flex items-center justify-center flex-shrink-0">
+                  <span className="text-xs font-medium text-amber-700">+{cart.length - 6}</span>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
         <h2 className="font-semibold text-gray-900 mb-4">Acções rápidas</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <Link to="/upload" className="flex items-center gap-3 p-4 border border-dashed border-gray-300 rounded-lg hover:border-primary-400 hover:bg-primary-50 transition-colors group">
