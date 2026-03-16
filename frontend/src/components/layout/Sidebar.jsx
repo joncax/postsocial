@@ -7,13 +7,15 @@ import {
   AlertCircle,
   Settings,
   LogOut,
-  Zap
+  Zap,
+  FileImage
 } from 'lucide-react'
 import { useCart } from '../../context/CartContext'
 
 const navItems = [
   { to: '/dashboard',  icon: LayoutDashboard, label: 'Dashboard' },
   { to: '/queues',     icon: ListVideo,        label: 'Filas' },
+  { to: '/posts',      icon: FileImage,        label: 'Posts' },
   { to: '/upload',     icon: Upload,           label: 'Novo Post' },
   { to: '/errors',     icon: AlertCircle,      label: 'Erros' },
   { to: '/settings',   icon: Settings,         label: 'Definições' },

@@ -66,12 +66,56 @@ async def update_post(post_id: UUID, data: PostUpdate, db: AsyncSession = Depend
 
 @router.patch("/{post_id}/approve")
 async def approve_post(post_id: UUID, db: AsyncSession = Depends(get_db)):
+    from datetime import datetime, timezone
+
     result = await db.execute(select(Post).where(Post.id == post_id))
     post = result.scalar_one_or_none()
     if not post:
-        raise HTTPException(status_code=404, detail="Post não encontrado")
+        raise HTTPException(status_code=404, detail="Post nao encontrado")
     if post.status != "pending_review":
-        raise HTTPException(status_code=400, detail="Post não está em revisão")
+        raise HTTPException(status_code=400, detail="Post nao esta em revisao")
+
+    # Calcular próximo slot disponível na fila
+    queue_result = await db.execute(select(Queue).where(Queue.id == post.queue_id))
+    queue = queue_result.scalar_one_or_none()
+
+    if queue and queue.rules:
+        from datetime import datetime, timedelta, timezone
+        rules = queue.rules
+        publish_times = rules.get('publish_times', ['18:00'])
+        allowed_days = rules.get('allowed_days', [1,2,3,4,5])
+        min_interval = rules.get('min_interval_hours', 24)
+
+        # Buscar último post agendado nesta fila
+        last_result = await db.execute(
+            select(Post)
+            .where(Post.queue_id == queue.id)
+            .where(Post.status.in_(['scheduled', 'published']))
+            .where(Post.id != post.id)
+            .order_by(Post.scheduled_at.desc())
+        )
+        last_post = last_result.scalars().first()
+
+        # Começar a partir do último post ou agora
+        start = last_post.scheduled_at if last_post and last_post.scheduled_at else datetime.now(timezone.utc)
+        if start.tzinfo is None:
+            start = start.replace(tzinfo=timezone.utc)
+
+        # Encontrar próximo slot
+        current = start.replace(minute=0, second=0, microsecond=0)
+        found = None
+        for _ in range(24 * 60):  # max 60 dias
+            current += timedelta(hours=1)
+            if current.isoweekday() not in allowed_days:
+                continue
+            current_time = current.strftime('%H:%M')
+            if current_time in publish_times:
+                found = current
+                break
+
+        if found:
+            post.scheduled_at = found
+
     post.status = "scheduled"
     await db.flush()
     return {"message": "Post aprovado e agendado"}

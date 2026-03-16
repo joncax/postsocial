@@ -50,8 +50,8 @@ export default function Dashboard() {
 
   const statCards = [
     { label: "Filas activas",      value: stats.queues,    icon: ListVideo,    color: "text-blue-600",   bg: "bg-blue-50",   link: "/queues" },
-    { label: "Posts agendados",    value: stats.pending,   icon: Clock,        color: "text-yellow-600", bg: "bg-yellow-50", link: "/queues" },
-    { label: "Posts publicados",   value: stats.published, icon: CheckCircle,  color: "text-green-600",  bg: "bg-green-50",  link: "/queues" },
+    { label: "Posts agendados",    value: stats.pending,   icon: Clock,        color: "text-yellow-600", bg: "bg-yellow-50", link: "/posts?status=scheduled" },
+    { label: "Posts publicados",   value: stats.published, icon: CheckCircle,  color: "text-green-600",  bg: "bg-green-50",  link: "/posts?status=published" },
     { label: "Erros por resolver", value: stats.errors,    icon: AlertCircle,  color: "text-red-600",    bg: "bg-red-50",    link: "/errors" },
   ]
 
