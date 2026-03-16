@@ -7,6 +7,7 @@ from ai import routes as ai_routes
 from scheduler import routes as scheduler_routes
 from scheduler.queue_scheduler import start_scheduler, stop_scheduler
 from publisher import routes as publisher_routes
+from api import user_settings as settings_routes
 from auth import routes as auth_routes
 
 @asynccontextmanager
@@ -43,6 +44,7 @@ app.include_router(media.router)
 app.include_router(ai_routes.router)
 app.include_router(scheduler_routes.router)
 app.include_router(publisher_routes.router)
+app.include_router(settings_routes.router)
 
 @app.get("/")
 async def root():

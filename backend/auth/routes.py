@@ -1,4 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
+from pydantic import BaseModel, Field
+from typing import Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from storage.database import get_db
@@ -72,3 +74,36 @@ async def list_plans(db: AsyncSession = Depends(get_db)):
         .order_by(Plan.price_monthly.asc())
     )
     return result.scalars().all()
+
+class ProfileUpdate(BaseModel):
+    full_name: Optional[str] = None
+
+class PasswordUpdate(BaseModel):
+    current_password: str
+    new_password: str = Field(..., min_length=8)
+
+@router.patch("/profile")
+async def update_profile(
+    data: ProfileUpdate,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    if data.full_name is not None:
+        current_user.full_name = data.full_name
+    await db.flush()
+    return {"message": "Perfil actualizado"}
+
+@router.patch("/password")
+async def update_password(
+    data: PasswordUpdate,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    if not verify_password(data.current_password, current_user.password_hash):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Password actual incorrecta"
+        )
+    current_user.password_hash = hash_password(data.new_password)
+    await db.flush()
+    return {"message": "Password alterada com sucesso"}
