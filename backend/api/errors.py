@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from sqlalchemy import select, cast
+from sqlalchemy.dialects.postgresql import VARCHAR
 from storage.database import get_db
 from storage.models import Error, Post
 from api.schemas import ErrorResponse, ErrorResolve
@@ -17,7 +18,7 @@ async def list_errors(
 ):
     query = select(Error).order_by(Error.occurred_at.desc())
     if status:
-        query = query.where(Error.status == status)
+        query = query.where(cast(Error.status, VARCHAR) == status)
     result = await db.execute(query)
     return result.scalars().all()
 
