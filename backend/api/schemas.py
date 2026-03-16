@@ -172,3 +172,40 @@ class ErrorResolve(BaseModel):
     resolution_note: Optional[str] = None
     action: str = Field(..., pattern="^(fix|reschedule|cancel)$")
     scheduled_at: Optional[datetime] = None
+# ── Auth ─────────────────────────────────────────────────────
+class UserRegister(BaseModel):
+    email: str
+    password: str = Field(..., min_length=8)
+    full_name: Optional[str] = None
+
+class UserLogin(BaseModel):
+    email: str
+    password: str
+
+class TokenResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+
+class UserResponse(BaseModel):
+    id: UUID
+    email: str
+    full_name: Optional[str]
+    is_active: bool
+    is_verified: bool
+    posts_this_month: int
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+class PlanResponse(BaseModel):
+    id: UUID
+    name: str
+    display_name: str
+    max_posts_per_month: Optional[int]
+    max_queues: int
+    max_instagram_accounts: int
+    price_monthly: float
+
+    class Config:
+        from_attributes = True

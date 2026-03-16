@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from sqlalchemy import select, cast
+from sqlalchemy.dialects.postgresql import VARCHAR
 from storage.database import get_db
 from storage.models import Post, Queue, Platform
 from api.schemas import PostCreate, PostUpdate, PostResponse

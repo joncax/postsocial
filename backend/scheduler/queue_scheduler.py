@@ -1,7 +1,8 @@
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.interval import IntervalTrigger
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, and_
+from sqlalchemy import select, and_, cast
+from sqlalchemy.dialects.postgresql import VARCHAR
 from storage.database import AsyncSessionLocal
 from storage.models import Post, Queue, Error
 from datetime import datetime, timezone
@@ -26,7 +27,7 @@ async def check_and_publish():
                 .join(Queue, Post.queue_id == Queue.id)
                 .where(
                     and_(
-                        Post.status == "scheduled",
+                        cast(Post.status, VARCHAR) == "scheduled",
                         Post.scheduled_at <= now,
                         Queue.is_active == True
                     )

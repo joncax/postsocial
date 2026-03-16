@@ -7,6 +7,7 @@ from ai import routes as ai_routes
 from scheduler import routes as scheduler_routes
 from scheduler.queue_scheduler import start_scheduler, stop_scheduler
 from publisher import routes as publisher_routes
+from auth import routes as auth_routes
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -31,6 +32,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(auth_routes.router)
 app.include_router(queues.router)
 app.include_router(posts.router)
 app.include_router(errors.router)

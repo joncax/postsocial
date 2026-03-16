@@ -1,12 +1,44 @@
 from sqlalchemy import (
     Column, String, Boolean, Text, Integer, SmallInteger,
-    ARRAY, ForeignKey, TIMESTAMP
+    ARRAY, ForeignKey, TIMESTAMP, Numeric
 )
 from sqlalchemy.dialects.postgresql import UUID, JSONB
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
 import uuid
 from storage.database import Base
+
+class Plan(Base):
+    __tablename__ = "plans"
+    id                     = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    name                   = Column(String(20), nullable=False, unique=True)
+    display_name           = Column(String(100), nullable=False)
+    max_posts_per_month    = Column(Integer)
+    max_queues             = Column(Integer, nullable=False, default=1)
+    max_instagram_accounts = Column(Integer, nullable=False, default=1)
+    max_team_members       = Column(Integer, nullable=False, default=1)
+    price_monthly          = Column(Numeric(10,2), nullable=False, default=0)
+    is_active              = Column(Boolean, nullable=False, default=True)
+    created_at             = Column(TIMESTAMP(timezone=True), server_default=func.now())
+
+    users = relationship("User", back_populates="plan")
+
+class User(Base):
+    __tablename__ = "users"
+    id               = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    email            = Column(String(255), nullable=False, unique=True)
+    password_hash    = Column(Text, nullable=False)
+    full_name        = Column(String(255))
+    plan_id          = Column(UUID(as_uuid=True), ForeignKey("plans.id"), nullable=False)
+    is_active        = Column(Boolean, nullable=False, default=True)
+    is_verified      = Column(Boolean, nullable=False, default=False)
+    posts_this_month = Column(Integer, nullable=False, default=0)
+    last_reset_date  = Column(TIMESTAMP(timezone=True), server_default=func.now())
+    created_at       = Column(TIMESTAMP(timezone=True), server_default=func.now())
+    updated_at       = Column(TIMESTAMP(timezone=True), server_default=func.now())
+
+    plan   = relationship("Plan", back_populates="users")
+    queues = relationship("Queue", back_populates="user")
 
 class Platform(Base):
     __tablename__ = "platforms"
@@ -16,6 +48,7 @@ class Platform(Base):
     api_key_enc  = Column(Text)
     is_active    = Column(Boolean, nullable=False, default=False)
     config       = Column(JSONB, default={})
+    user_id      = Column(UUID(as_uuid=True), ForeignKey("users.id"))
     created_at   = Column(TIMESTAMP(timezone=True), server_default=func.now())
     updated_at   = Column(TIMESTAMP(timezone=True), server_default=func.now())
 
@@ -36,6 +69,7 @@ class Queue(Base):
     name              = Column(String(100), nullable=False)
     description       = Column(Text)
     platform_id       = Column(UUID(as_uuid=True), ForeignKey("platforms.id"), nullable=False)
+    user_id           = Column(UUID(as_uuid=True), ForeignKey("users.id"))
     is_active         = Column(Boolean, nullable=False, default=True)
     action_on_error   = Column(String(20), nullable=False, default="pause")
     rules             = Column(JSONB, nullable=False, default={})
@@ -44,9 +78,10 @@ class Queue(Base):
     created_at        = Column(TIMESTAMP(timezone=True), server_default=func.now())
     updated_at        = Column(TIMESTAMP(timezone=True), server_default=func.now())
 
-    platform = relationship("Platform")
+    platform       = relationship("Platform")
     story_template = relationship("StoryTemplate")
-    posts    = relationship("Post", back_populates="queue")
+    posts          = relationship("Post", back_populates="queue")
+    user           = relationship("User", back_populates="queues")
 
 class Post(Base):
     __tablename__ = "posts"
@@ -133,7 +168,7 @@ class Error(Base):
     occurred_at     = Column(TIMESTAMP(timezone=True), server_default=func.now())
     updated_at      = Column(TIMESTAMP(timezone=True), server_default=func.now())
 
-    post  = relationship("Post", back_populates="errors")
+    post = relationship("Post", back_populates="errors")
 
 class Notification(Base):
     __tablename__ = "notifications"
