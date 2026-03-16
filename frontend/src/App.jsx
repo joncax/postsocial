@@ -4,6 +4,7 @@ import ProtectedRoute from './components/ProtectedRoute'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import Dashboard from './pages/Dashboard'
+import Queues from './pages/Queues'
 
 // Páginas placeholder para as rotas que vamos construir
 const PlaceholderPage = ({ title }) => (
@@ -26,7 +27,7 @@ export default function App() {
             <ProtectedRoute><Dashboard /></ProtectedRoute>
           } />
           <Route path="/queues" element={
-            <ProtectedRoute><PlaceholderPage title="Filas" /></ProtectedRoute>
+            <ProtectedRoute><Queues /></ProtectedRoute>
           } />
           <Route path="/upload" element={
             <ProtectedRoute><PlaceholderPage title="Novo Post" /></ProtectedRoute>

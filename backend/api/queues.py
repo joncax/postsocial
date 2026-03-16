@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from sqlalchemy import select, cast, text
 from storage.database import get_db
 from storage.models import Queue, Platform, User
 from api.schemas import QueueCreate, QueueUpdate, QueueResponse
@@ -46,7 +46,8 @@ async def create_queue(
     if not platform.scalar_one_or_none():
         raise HTTPException(status_code=404, detail="Plataforma nao encontrada")
 
-    queue = Queue(**data.model_dump(), user_id=current_user.id)
+    queue_data = data.model_dump()
+    queue = Queue(**queue_data, user_id=current_user.id)
     db.add(queue)
     await db.flush()
     await db.refresh(queue)
