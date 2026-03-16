@@ -7,6 +7,7 @@ import Register from './pages/Register'
 import Dashboard from './pages/Dashboard'
 import Queues from './pages/Queues'
 import NewPost from './pages/NewPost'
+import Errors from './pages/Errors'
 
 // Páginas placeholder para as rotas que vamos construir
 const PlaceholderPage = ({ title }) => (
@@ -36,7 +37,7 @@ export default function App() {
             <ProtectedRoute><NewPost /></ProtectedRoute>
           } />
           <Route path="/errors" element={
-            <ProtectedRoute><PlaceholderPage title="Erros" /></ProtectedRoute>
+            <ProtectedRoute><Errors /></ProtectedRoute>
           } />
           <Route path="/settings" element={
             <ProtectedRoute><PlaceholderPage title="Definições" /></ProtectedRoute>
